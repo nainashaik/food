@@ -1,0 +1,25 @@
+currentBuild.displayName = "myntre-foods-#"+currentBuild.number
+pipeline{
+agent any
+environment{
+PATH = "/usr/share/maven/bin:$PATH"
+}
+stages{
+    stage("Git checkout"){
+        steps{
+            git credentialsId: 'root', url: 'git@github.com:nsatyan/foods-project.git'
+          }
+          }
+     stage("Buuild package"){
+        steps{
+        sh "mvn clean package"
+          }
+          }
+     stage("Store Artifacte"){
+        steps{
+      nexusArtifactUploader artifacts: [[artifactId: 'foodproject-webapp', classifier: '', file: 'target/foodproject-webapp.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.food', nexusUrl: '34.125.173.62:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'food-project', version: '0.0.1'
+        }
+          }
+          
+     }
+}
